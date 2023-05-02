@@ -1,0 +1,56 @@
+
+type Tweet {
+    id: ID!
+    # The tweet text. No more than 140 characters!
+    content: String
+    # When the tweet was published
+    date: String
+    # Who published the tweet
+    Author: User
+    # Views, retweets, likes, etc
+    Stats: TweetStat
+    replyTo: ID
+    retweets(count: Int, from: ID): TweetsConnection!
+    thread(count: Int, from: ID): TweetsConnection!
+}
+
+type TweetsConnection {
+    edges: [TweetEdge!]!
+    pageInfo: TweetPageInfo!
+}
+
+type TweetEdge {
+    cursor: ID!
+    node: Tweet!
+}
+
+type TweetPageInfo {
+    endCursor: ID
+    hasNextPage: Boolean!
+}
+
+type TweetStat {
+    tweetId: ID!
+    likes: Int!
+    retweets: Int!
+}
+
+extend type Query {
+    timeline(count:Int!, from: ID): TweetsConnection!
+    tweet(id: ID!): Tweet!
+    tweets(limit: Int, skip: Int, sort_field: String, sort_order: String): [Tweet!]!
+}
+
+extend type Mutation {
+    createTweet (
+        content: String!,
+        replyTo: ID
+    ): Tweet
+    deleteTweet(id: ID!): Tweet
+}
+
+extend type Subscription {
+    newTimeline: [Tweet!]!
+    tweetStats(id: ID!): TweetStat
+}
+
